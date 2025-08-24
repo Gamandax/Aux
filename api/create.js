@@ -30,6 +30,7 @@ export default async function handler(req, res) {
         
         res.json({ success: true, id: id });
     } catch (error) {
+        console.error('Redis error:', error);
         res.status(500).json({ error: 'Failed to save script' });
     }
 }
