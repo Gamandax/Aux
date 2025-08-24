@@ -1,23 +1,32 @@
-import { scripts } from '../create.js';
+import { createClient } from 'redis';
 
-export default function handler(req, res) {
+const client = createClient({
+    url: process.env.REDIS_URL
+});
+
+export default async function handler(req, res) {
     const { id } = req.query;
     
     if (!id) {
         return res.status(400).send('Missing script ID');
     }
 
-    const scriptData = scripts.get(id);
-    
-    if (!scriptData) {
-        return res.status(404).send('Script not found');
-    }
+    try {
+        await client.connect();
+        const scriptDataString = await client.get(`script:${id}`);
+        await client.disconnect();
+        
+        if (!scriptDataString) {
+            return res.status(404).send('Script not found');
+        }
 
-    const userAgent = req.headers['user-agent'] || '';
-    const isBrowser = /mozilla|chrome|safari|firefox|edge/i.test(userAgent);
-    
-    if (isBrowser) {
-        const passwordForm = `
+        const scriptData = JSON.parse(scriptDataString);
+
+        const userAgent = req.headers['user-agent'] || '';
+        const isBrowser = /mozilla|chrome|safari|firefox|edge/i.test(userAgent);
+        
+        if (isBrowser) {
+            const passwordForm = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -91,12 +100,15 @@ export default function handler(req, res) {
     </script>
 </body>
 </html>`;
-        
-        res.setHeader('Content-Type', 'text/html');
-        res.send(passwordForm);
-        
-    } else {
-        res.setHeader('Content-Type', 'text/plain');
-        res.send(scriptData.script);
+            
+            res.setHeader('Content-Type', 'text/html');
+            res.send(passwordForm);
+            
+        } else {
+            res.setHeader('Content-Type', 'text/plain');
+            res.send(scriptData.script);
+        }
+    } catch (error) {
+        res.status(500).send('Server error');
     }
 }
