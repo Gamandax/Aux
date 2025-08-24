@@ -1,6 +1,10 @@
-const scripts = new Map();
+import { createClient } from 'redis';
 
-export default function handler(req, res) {
+const client = createClient({
+    url: process.env.REDIS_URL
+});
+
+export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -13,13 +17,19 @@ export default function handler(req, res) {
 
     const id = Math.random().toString(36).substr(2, 12);
     
-    scripts.set(id, {
-        script: script,
-        password: password,
-        created: Date.now()
-    });
+    try {
+        await client.connect();
+        
+        await client.set(`script:${id}`, JSON.stringify({
+            script: script,
+            password: password,
+            created: Date.now()
+        }));
 
-    res.json({ success: true, id: id });
+        await client.disconnect();
+        
+        res.json({ success: true, id: id });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to save script' });
+    }
 }
-
-export { scripts };
