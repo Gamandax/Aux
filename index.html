@@ -1,191 +1,363 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Aux V2 - Script Protector</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Script Protector</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #0a0a0a; 
-            color: #fff; 
-            font-family: 'Segoe UI', sans-serif; 
-            min-height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container { 
-            background: #1a1a1a; 
-            border-radius: 12px; 
-            padding: 2rem; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5); 
-            border: 1px solid #333; 
-            max-width: 600px; 
-            width: 90%; 
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
         }
-        h1 { 
-            text-align: center; 
-            color: #00ff88; 
-            margin-bottom: 2rem; 
-            font-size: 2.5rem; 
-            text-shadow: 0 0 20px rgba(0,255,136,0.3); 
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            overflow: hidden;
         }
-        .form-group { margin-bottom: 1.5rem; }
-        label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            color: #ccc; 
-            font-weight: 500; 
+        
+        .header {
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            padding: 25px;
+            text-align: center;
+            color: #000;
         }
-        textarea, input { 
-            width: 100%; 
-            background: #0f0f0f; 
-            border: 2px solid #333; 
-            border-radius: 8px; 
-            padding: 12px; 
-            color: #fff; 
-            font-family: 'Consolas', monospace; 
-            font-size: 14px; 
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
         }
-        textarea { height: 200px; resize: vertical; }
-        textarea:focus, input:focus { 
-            outline: none; 
-            border-color: #00ff88; 
-            box-shadow: 0 0 10px rgba(0,255,136,0.2); 
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.8;
         }
-        .btn { 
-            background: linear-gradient(45deg, #00ff88, #00cc6a); 
-            border: none; 
-            color: #000; 
-            padding: 12px 30px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold; 
-            width: 100%; 
-            margin-top: 1rem; 
+        
+        .content {
+            padding: 30px;
         }
-        .btn:hover { 
-            background: linear-gradient(45deg, #00cc6a, #00aa56); 
-            transform: translateY(-2px); 
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #00ff88;
+            border-left: 4px solid #00ff88;
+            padding-left: 15px;
         }
-        .result { 
-            margin-top: 2rem; 
-            background: #0f0f0f; 
-            border: 2px solid #333; 
-            border-radius: 8px; 
-            padding: 1rem; 
-            display: none; 
+        
+        textarea, input {
+            width: 100%;
+            background: #0f0f0f;
+            border: 2px solid #333;
+            border-radius: 10px;
+            color: #ffffff;
+            padding: 15px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
         }
-        .result h3 { color: #00ff88; margin-bottom: 1rem; }
-        .url-box { 
-            background: #1a1a1a; 
-            border: 1px solid #444; 
-            padding: 10px; 
-            border-radius: 6px; 
-            word-break: break-all; 
-            font-family: monospace; 
-            font-size: 12px; 
-            margin-bottom: 10px; 
+        
+        textarea {
+            min-height: 150px;
+            line-height: 1.4;
         }
-        .copy-btn { 
-            background: #333; 
-            border: 1px solid #555; 
-            color: #fff; 
-            padding: 5px 15px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 12px; 
+        
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+            background: #151515;
         }
-        .copy-btn:hover { background: #555; }
-        .loading { display: none; text-align: center; color: #00ff88; }
+        
+        textarea::placeholder, input::placeholder {
+            color: #888;
+            font-style: italic;
+        }
+        
+        .button {
+            width: 100%;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+            background: linear-gradient(45deg, #00cc6a, #00ff88);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+            border-radius: 10px;
+            border: 1px solid #333;
+            display: none;
+        }
+        
+        .result h4 {
+            color: #00ff88;
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .result p {
+            color: #ccc;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .url-container {
+            position: relative;
+        }
+        
+        #protectedUrl {
+            padding-right: 60px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            word-break: break-all;
+        }
+        
+        .copy-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #00ff88;
+            border: none;
+            border-radius: 5px;
+            color: #000;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-button:hover {
+            background: #00cc6a;
+        }
+        
+        .footer {
+            background: #0f0f0f;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #333;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .header p {
+                font-size: 14px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+            }
+            
+            textarea, input {
+                font-size: 16px;
+                padding: 12px;
+            }
+            
+            .button {
+                padding: 15px;
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .result {
+                padding: 20px 15px;
+            }
+            
+            #protectedUrl {
+                font-size: 12px;
+                padding-right: 50px;
+            }
+            
+            .copy-button {
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1> Aux </h1>
+        <div class="header">
+            <h1>Aux V 1.0.0.0</h1>
+            <p>Aux Development</p>
+        </div>
         
-        <form id="protectForm">
-            <div class="form-group">
-                <label for="script">Put your Script here:</label>
-                <textarea id="script" placeholder='print("Hello World!")' required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="text" id="password" placeholder="Enter protection password" required>
-            </div>
-
-            <button type="submit" class="btn">🔒 Protect!</button>
-        </form>
-
-        <div class="loading" id="loading">⏳ Creating protected script...</div>
-
-        <div class="result" id="result">
-            <h3>✅ Protected Script Created!</h3>
-            <p><strong>Raw Link:</strong></p>
-            <div class="url-box" id="rawUrl"></div>
-            <button class="copy-btn" onclick="copyUrl()">📋 Copy</button>
+        <div class="content">
+            <div class="section-title">Welcome!</div>
             
-            <p style="margin-top: 1rem;"><strong>Usage in Executor:</strong></p>
-            <div class="url-box" id="usageCode">loadstring(game:HttpGet(""))()</div>
-            <button class="copy-btn" onclick="copyUsage()">📋 Copy Code</button>
+            <textarea id="scriptInput" placeholder="Paste your Lua script here..." rows="8"></textarea>
+            
+            <input type="password" id="passwordInput" placeholder="Enter protection password">
+            
+            <button class="button" onclick="createScript()">Protect Script</button>
+            
+            <div id="result" class="result">
+                <h4>Script Protected Successfully</h4>
+                <p>Always Use a loadstring copy it below and use it in your executor:</p>
+                <div class="url-container">
+                    <input type="text" id="protectedUrl" readonly>
+                    <button class="copy-button" onclick="copyUrl()">Copy</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Protect your Roblox scripts from unauthorized Access</p>
+            <p>By Aux X VantaXock </p>
         </div>
     </div>
 
     <script>
-        document.getElementById('protectForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        async function createScript() {
+            const script = document.getElementById('scriptInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
             
-            const script = document.getElementById('script').value;
-            const password = document.getElementById('password').value;
+            if (!script) {
+                alert('Please enter a script to protect!');
+                document.getElementById('scriptInput').focus();
+                return;
+            }
             
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('result').style.display = 'none';
+            if (!password) {
+                alert('Please set a protection password!');
+                document.getElementById('passwordInput').focus();
+                return;
+            }
+            
+            const button = document.querySelector('.button');
+            const originalText = button.textContent;
+            button.textContent = 'Creating...';
+            button.disabled = true;
             
             try {
                 const response = await fetch('/api/create', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ script, password })
                 });
                 
-                const data = await response.json();
+                const result = await response.json();
                 
-                if (data.success) {
-                    const rawUrl = `${window.location.origin}/api/raw/${data.id}`;
-                    document.getElementById('rawUrl').textContent = rawUrl;
-                    document.getElementById('usageCode').textContent = `loadstring(game:HttpGet("${rawUrl}"))()`;
-                    
-                    document.getElementById('loading').style.display = 'none';
+                if (result.success) {
+                    const url = `${window.location.origin}/api/raw/${result.id}`;
+                    document.getElementById('protectedUrl').value = `loadstring(game:HttpGet("${url}"))()`;
                     document.getElementById('result').style.display = 'block';
                     
-                    document.getElementById('script').value = '';
-                    document.getElementById('password').value = '';
+                    // Clear inputs
+                    document.getElementById('scriptInput').value = '';
+                    document.getElementById('passwordInput').value = '';
+                    
+                    // Scroll to result
+                    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    alert('Error: ' + data.error);
-                    document.getElementById('loading').style.display = 'none';
+                    alert('Error: ' + (result.error || 'Unknown error occurred'));
                 }
             } catch (error) {
-                alert('Error creating protected script');
-                document.getElementById('loading').style.display = 'none';
+                alert('Network error: ' + error.message);
+            }
+            
+            button.textContent = originalText;
+            button.disabled = false;
+        }
+        
+        function copyUrl() {
+            const urlInput = document.getElementById('protectedUrl');
+            urlInput.select();
+            urlInput.setSelectionRange(0, 99999);
+            
+            try {
+                navigator.clipboard.writeText(urlInput.value);
+                const button = document.querySelector('.copy-button');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#00ff88';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            } catch (err) {
+                alert('URL copied to clipboard!');
+            }
+        }
+        
+        // Enter key support
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                createScript();
             }
         });
         
-        function copyUrl() {
-            const url = document.getElementById('rawUrl').textContent;
-            navigator.clipboard.writeText(url);
-            event.target.textContent = '✅ Copied!';
-            setTimeout(() => event.target.textContent = '📋 Copy', 2000);
-        }
-        
-        function copyUsage() {
-            const code = document.getElementById('usageCode').textContent;
-            navigator.clipboard.writeText(code);
-            event.target.textContent = '✅ Copied!';
-            setTimeout(() => event.target.textContent = '📋 Copy Code', 2000);
-        }
+        // Auto-resize textarea
+        document.getElementById('scriptInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(150, this.scrollHeight) + 'px';
+        });
     </script>
 </body>
 </html>
