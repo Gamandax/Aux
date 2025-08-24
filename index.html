@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Protector</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #0a0a0a; 
+            color: #fff; 
+            font-family: 'Segoe UI', sans-serif; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .container { 
+            background: #1a1a1a; 
+            border-radius: 12px; 
+            padding: 2rem; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5); 
+            border: 1px solid #333; 
+            max-width: 600px; 
+            width: 90%; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #00ff88; 
+            margin-bottom: 2rem; 
+            font-size: 2.5rem; 
+            text-shadow: 0 0 20px rgba(0,255,136,0.3); 
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: #ccc; 
+            font-weight: 500; 
+        }
+        textarea, input { 
+            width: 100%; 
+            background: #0f0f0f; 
+            border: 2px solid #333; 
+            border-radius: 8px; 
+            padding: 12px; 
+            color: #fff; 
+            font-family: 'Consolas', monospace; 
+            font-size: 14px; 
+        }
+        textarea { height: 200px; resize: vertical; }
+        textarea:focus, input:focus { 
+            outline: none; 
+            border-color: #00ff88; 
+            box-shadow: 0 0 10px rgba(0,255,136,0.2); 
+        }
+        .btn { 
+            background: linear-gradient(45deg, #00ff88, #00cc6a); 
+            border: none; 
+            color: #000; 
+            padding: 12px 30px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+            width: 100%; 
+            margin-top: 1rem; 
+        }
+        .btn:hover { 
+            background: linear-gradient(45deg, #00cc6a, #00aa56); 
+            transform: translateY(-2px); 
+        }
+        .result { 
+            margin-top: 2rem; 
+            background: #0f0f0f; 
+            border: 2px solid #333; 
+            border-radius: 8px; 
+            padding: 1rem; 
+            display: none; 
+        }
+        .result h3 { color: #00ff88; margin-bottom: 1rem; }
+        .url-box { 
+            background: #1a1a1a; 
+            border: 1px solid #444; 
+            padding: 10px; 
+            border-radius: 6px; 
+            word-break: break-all; 
+            font-family: monospace; 
+            font-size: 12px; 
+            margin-bottom: 10px; 
+        }
+        .copy-btn { 
+            background: #333; 
+            border: 1px solid #555; 
+            color: #fff; 
+            padding: 5px 15px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 12px; 
+        }
+        .copy-btn:hover { background: #555; }
+        .loading { display: none; text-align: center; color: #00ff88; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1> Aux </h1>
+        
+        <form id="protectForm">
+            <div class="form-group">
+                <label for="script">Put your Script here:</label>
+                <textarea id="script" placeholder='print("Hello World!")' required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="text" id="password" placeholder="Enter protection password" required>
+            </div>
+
+            <button type="submit" class="btn">🔒 Protect!</button>
+        </form>
+
+        <div class="loading" id="loading">⏳ Creating protected script...</div>
+
+        <div class="result" id="result">
+            <h3>✅ Protected Script Created!</h3>
+            <p><strong>Raw Link:</strong></p>
+            <div class="url-box" id="rawUrl"></div>
+            <button class="copy-btn" onclick="copyUrl()">📋 Copy</button>
+            
+            <p style="margin-top: 1rem;"><strong>Usage in Executor:</strong></p>
+            <div class="url-box" id="usageCode">loadstring(game:HttpGet(""))()</div>
+            <button class="copy-btn" onclick="copyUsage()">📋 Copy Code</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('protectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const script = document.getElementById('script').value;
+            const password = document.getElementById('password').value;
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ script, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const rawUrl = `${window.location.origin}/api/raw/${data.id}`;
+                    document.getElementById('rawUrl').textContent = rawUrl;
+                    document.getElementById('usageCode').textContent = `loadstring(game:HttpGet("${rawUrl}"))()`;
+                    
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('result').style.display = 'block';
+                    
+                    document.getElementById('script').value = '';
+                    document.getElementById('password').value = '';
+                } else {
+                    alert('Error: ' + data.error);
+                    document.getElementById('loading').style.display = 'none';
+                }
+            } catch (error) {
+                alert('Error creating protected script');
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+        
+        function copyUrl() {
+            const url = document.getElementById('rawUrl').textContent;
+            navigator.clipboard.writeText(url);
+            event.target.textContent = '✅ Copied!';
+            setTimeout(() => event.target.textContent = '📋 Copy', 2000);
+        }
+        
+        function copyUsage() {
+            const code = document.getElementById('usageCode').textContent;
+            navigator.clipboard.writeText(code);
+            event.target.textContent = '✅ Copied!';
+            setTimeout(() => event.target.textContent = '📋 Copy Code', 2000);
+        }
+    </script>
+</body>
+</html>
